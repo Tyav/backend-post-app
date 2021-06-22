@@ -6,8 +6,6 @@ export interface IUser extends Document {
   email: string;
   password: string;
   verified: boolean;
-  approved: boolean;
-  address: string | Document;
   isAdmin: boolean
   createdAt: string;
   updatedAt: string;
@@ -31,14 +29,6 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    approved: {
-      type: Boolean,
-      default: false,
-    },
-    // address: {
-    //   type: Types.ObjectId,
-    //   ref: 'Address',
-    // },
     isAdmin: { type: Boolean, default: false }
   },
   {
@@ -71,25 +61,13 @@ UserSchema.pre<IUser>('save', function (next) {
   });
 });
 
-/* always attach populate to any find method (eg. findOne, find, findOneAndUpdate...) */
-UserSchema.pre<IUser>(/^find/, function () {
-  this.populate('address');
-});
-UserSchema.post<IUser>('save', function (doc, next) {
-  doc
-    .populate('address')
-    .execPopulate()
-    .then(() => {
-      next();
-    });
-});
 
 /**
  * Methods
  */
 UserSchema.methods = {
   toJSON() {
-    const { password, _id, __v, isSuper, ...rest } = this.toObject();
+    const { password, _id, __v, ...rest } = this.toObject() as IUser;
     return { ...rest, id: _id };
   },
 };

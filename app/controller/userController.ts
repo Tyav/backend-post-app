@@ -9,7 +9,7 @@ import TokenService, { TokenType } from '../services/tokenService';
 import emailService from '../services/emailService';
 import { baseUrl, mailSender } from '../../config/env';
 import accountVerificationService from '../services/accountVerificationService';
-import { AccountType } from '../model/accountVerificationModel';
+import { IUser } from '../model/userModel';
 
 export class UserController {
   // Create user
@@ -29,31 +29,8 @@ export class UserController {
 
       // create user after checks, password is removed on return. return value is lean
       user = await userService.create(req.body);
-      const email = user.email;
       /** Sign Token */
-
-      const accountVerification = await accountVerificationService.create({
-        user: user._id,
-        type: AccountType.USER,
-      });
-      const token = accountVerification.token;
-      const userToken = TokenService.issue({
-        user: user._id,
-        token,
-        type: TokenType.VERIFY,
-      });
-      /* Send  */
-
-      emailService
-        .sendEmail({
-          to: [email],
-          subject: 'Verification token',
-          text: `${baseUrl}/verify/${userToken}`,
-          from: mailSender,
-        })
-        .catch(err => {
-          console.log('Logging to sentry ===>', err);
-        });
+      UserController.sendVerification(user);
 
       res
         .status(201)
@@ -74,9 +51,18 @@ export class UserController {
       const user = await userService.getByEmail(modifiedEmail);
 
       /** Ensure that user exists on DB*/
-      if (!user || !user.verified) {
+      if (!user ) {
         throw new APIError({
           message: 'Invalid email or password!',
+          status: httpStatus.NOT_FOUND,
+        });
+      }
+      /** Ensure that user exists on DB*/
+      if (!user.verified) {
+        // send a verification to user to verify Account
+        UserController.sendVerification(user);
+        throw new APIError({
+          message: 'Your account has not been verified, a link has been emailed to you to verify your account',
           status: httpStatus.NOT_FOUND,
         });
       }
@@ -105,6 +91,31 @@ export class UserController {
     } catch (error) {
       return next(error);
     }
+  }
+
+  static async sendVerification (user: IUser) {
+    const accountVerification = await accountVerificationService.create(
+      user._id,
+    );
+    const userId = (accountVerification.user as IUser)._id;
+    const userToken = TokenService.issue({
+      user: userId,
+      type: TokenType.VERIFY,
+    });
+    /* Send  */
+
+    emailService
+      .sendEmail({
+        to: [user.email],
+        subject: 'Account Verification',
+        text: `${baseUrl}/verify/${userToken}`,
+        from: mailSender,
+      })
+      .catch(err => {
+        console.log('Logging to sentry ===>', err);
+      });
+
+
   }
 }
 
