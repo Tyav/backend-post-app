@@ -2,8 +2,6 @@ import {
   AccountVerification,
   IAccountVerification,
 } from '../model/accountVerificationModel';
-import TokenService from './tokenService';
-// import emailService from './emailService';
 
 export class AccountVerificationService {
   /**
@@ -16,37 +14,20 @@ export class AccountVerificationService {
   /**
    * @description Creates an account verifier
    */
-  async create(data: Partial<IAccountVerification>): Promise<IAccountVerification> {
+  async create(user: string): Promise<IAccountVerification> {
     // delete existing account verification
-    await AccountVerification.deleteMany({ ...data });
-
-    let token = TokenService.generateCode();
-    let generate = true;
+    await AccountVerification.deleteMany({ user });
     const accountVerification = new AccountVerification({
-      user: data.user,
-      type: data.type
-    } as IAccountVerification);
-
-    while (generate) {
-      try {
-        // create account accountVerification
-        accountVerification.token = token;  // TODO: Impliment retry at most 5 times
-        await accountVerification.save();
-        // if no error is thrown, exit loop
-        generate = false;
-      } catch (error) {
-        // if error exist generate new code
-        token = TokenService.generateCode();
-      }
-    }
-    return accountVerification;
+      user: user,
+    });
+    return accountVerification.save();
   }
 
   /**
    * @description gets an account verifier
    */
-  async get(token: string, user: any): Promise<IAccountVerification | null> {
-    return AccountVerification.findOne({ token, user });
+  async get(user: string): Promise<IAccountVerification | null> {
+    return AccountVerification.findOne({ user });
   }
 }
 
