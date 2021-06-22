@@ -5,8 +5,8 @@ export class UserService {
    * @description Creates a user
    */
   async create(body: IUser): Promise<IUser> {
-    const retailer = new User(body);
-    return retailer.save();
+    const user = new User(body);
+    return user.save();
   }
 
   /**
@@ -26,7 +26,6 @@ export class UserService {
     const user = await User.findById(id);
     return user;
   }
-
 }
 
 export default new UserService();

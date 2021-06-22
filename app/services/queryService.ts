@@ -23,10 +23,6 @@ export interface IQueryResult {
 
 interface Builder {
   query: Partial<IQuery>;
-  genre: () => { genre: string };
-  artist: () => { artist: string };
-  album: () => { album: string };
-  tags: () => { tags: string };
   sort: () => { sort: string };
   limit: () => { limit: number };
   s: () => { s: string };
@@ -42,23 +38,11 @@ export default class QueryBuilder implements Builder {
     }
     this.query = query;
   }
-  genre() {
-    return { genre: this.query.genre! };
-  }
-  artist() {
-    return { artist: this.query.artist! };
-  }
-  album() {
-    return { album: this.query.album! };
-  }
   limit() {
     return { limit: +this.query.limit! };
   }
   sort() {
     return { sort: this.query.sort! };
-  }
-  tags() {
-    return { tags: this.query.tags! };
   }
   skip() {
     return { skip: +this.query.skip! };

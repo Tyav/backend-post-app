@@ -1,16 +1,8 @@
 import { Schema, model, Document } from 'mongoose';
 import { IUser } from './userModel';
-import { enumToArray } from '../types/generic';
-
-export enum AccountType {
-  ADMIN = 'Admin',
-  USER = 'User',
-}
 
 export interface IAccountVerification extends Document {
-  user: IUser;
-  token: string;
-  type: AccountType;
+  user: (string & IUser) | string;
 }
 
 const AccountVerificationSchema = new Schema(
@@ -18,11 +10,9 @@ const AccountVerificationSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       unique: true,
-      refPath: 'type',
+      ref: 'User',
       required: true,
     },
-    token: { type: String, unique: true, required: true },
-    type: { type: String, enum: enumToArray(AccountType) },
   },
   { timestamps: true }
 );

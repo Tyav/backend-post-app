@@ -44,10 +44,11 @@ export const converter = (
 ) => {
   let convertedError = err;
   if (isCelebrateError(err)) {
+    console.log(err)
     convertedError = new APIError({
       message: 'Invalid fields',
       status: httpStatus.BAD_REQUEST, //unprocessible entity
-      errors: /*customErrorMessage(err.details[]) ||*/ {},
+      errors: customErrorMessage(err.details.get('body')?.details) || {},
     });
   } else if (!(err instanceof APIError)) {
     convertedError = new APIError({

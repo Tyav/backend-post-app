@@ -13,7 +13,7 @@ router.post(
   celebrate(forgotPasswordValidation, { abortEarly: true }),
   ForgotPasswordController.handler
 );
-router.post('/verify', ForgotPasswordController.verify)
-router.post('/reset', celebrate( resetPasswordValidation, { abortEarly: true }), decode(TokenType.PASSWORD_RESET), ForgotPasswordController.reset)
+router.post('/verify', decode(TokenType.PASSWORD_RESET), ForgotPasswordController.verify)
+router.put('/reset', celebrate( resetPasswordValidation, { abortEarly: true }), decode(TokenType.PASSWORD_RESET), ForgotPasswordController.reset)
 
 export default router;

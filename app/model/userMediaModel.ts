@@ -1,18 +1,16 @@
 import { Schema, model, Document } from 'mongoose';
 import { IUser } from './userModel';
-import { enumToArray } from '../types/generic';
 
 export interface IUserMedia extends Document {
   user: string | IUser;
-  media: string ;
-  mediaType: string;
+  url: string ;
 }
 
 const UserMediaSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    media: { type: Schema.Types.ObjectId, refPath: 'mediaType', required: true },
-    mediaType: { type: String, enum: enumToArray(['image', 'video']), required: true },
+    url: { type: String, required: true },
+    deleted: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
@@ -20,15 +18,7 @@ const UserMediaSchema = new Schema(
 /* always attach populate to any save method (eg. findOne, find, findOneAndUpdate...) */
 UserMediaSchema.post<IUserMedia>('save', function (doc, next) {
   doc
-    .populate({ path: 'user', select: '_id name verified approved' })
-    .populate({
-      path: 'media',
-      populate: [
-        { path: 'genre', select: '_id name' },
-        { path: 'album', select: '_id name' },
-        { path: 'artist', select: '_id name' },
-      ],
-    })
+    .populate({ path: 'user', select: '_id name verified' })
     .execPopulate()
     .then(() => {
       next();
@@ -36,15 +26,7 @@ UserMediaSchema.post<IUserMedia>('save', function (doc, next) {
 });
 /* always attach populate to any find method (eg. findOne, find, findOneAndUpdate...) */
 UserMediaSchema.pre<IUserMedia>(/^find/, function () {
-  this.populate({ path: 'user', select: '_id name verified approved' });
-  this.populate({
-    path: 'media',
-    populate: [
-      { path: 'genre', select: '_id name' },
-      { path: 'album', select: '_id name' },
-      { path: 'artist', select: '_id name' },
-    ],
-  });
+  this.populate({ path: 'user', select: '_id name verified' });
 });
 
 /**
@@ -62,4 +44,4 @@ UserMediaSchema.methods = {
  */
 UserMediaSchema.statics = {};
 
-export const UserMedia = model<IUserMedia>('UserMedia', UserMediaSchema);
+export const UserMedia = model<IUserMedia>('Image', UserMediaSchema);

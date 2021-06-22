@@ -5,12 +5,13 @@ import APIError from '../../helpers/APIError';
 import sendResponse from '../../helpers/sendResponse';
 import TokenService, { TokenType } from '../services/tokenService';
 import accountVerificationService from '../services/accountVerificationService';
+import { IUser } from '../model/userModel';
 
 export class AuthController {
   async verify(req: Request, res: Response, next: NextFunction) {
     try {
-      const { token, id } = req.body;
-      const verificationFound = await accountVerificationService.get(token, id);
+      const { id } = req.body;
+      const verificationFound = await accountVerificationService.get(id);
       if (!verificationFound) {
         throw new APIError({
           message: 'Invalid token',
@@ -18,14 +19,15 @@ export class AuthController {
         });
       }
       // get user and set verified to true
-      let { user: userToVerify } = verificationFound;
+      let { user } = verificationFound;
+      const userToVerify = user as IUser;
       userToVerify.verified = true;
       userToVerify.save();
 
       // create token for user
       /** Sign Token */
       const signToken = TokenService.issue({
-        [`${verificationFound.type}`.toLowerCase()]: userToVerify._id,
+        user: userToVerify._id,
         email: userToVerify.email,
         type: TokenType.AUTH,
       });

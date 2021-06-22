@@ -45,16 +45,6 @@ const envVarsSchema = Joi.object({
   BASE_URL: Joi.string()
     .required()
     .description('base url to server where the app is hosted'),
-  // FRONTEND_URL: Joi.string()
-  //   .required()
-  //   .description('frontend base url to server where the frontend is hosted'),
-  // STRIPE_SECRET_KEY: Joi.string()
-  //   .required()
-  //   .description('Stripe secret key to initiate stripe'),
-  // STRIPE_PUBLISHABLE_KEY: Joi.string().required().description('Stripe public key'),
-  // STRIPE_WEBHOOK_SECRET: Joi.string()
-  //   .required()
-  //   .description('Stripe webhook secret'),
 })
   .unknown()
   .required();

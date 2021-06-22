@@ -6,11 +6,11 @@ import emailService from './emailService';
 import APIError from '../../helpers/APIError';
 import { baseUrl, jwtEmailSecret, mailSender } from '../../config/env';
 import userService from './userService';
-import { AccountType } from '../model/accountVerificationModel';
 import { IForgotPasswordToken } from '../types/generic';
+import { TokenType } from './tokenService';
 
 export class ForgotPasswordService {
-  static async handler({ email, type }: { email: string; type: AccountType }) {
+  static async handler(email: string) {
     const user = await this.getUser(email)
 
     if (!user) {
@@ -22,23 +22,21 @@ export class ForgotPasswordService {
 
     const forgotInfo = await this.storeForgotPasswordInfo({
       user: user._id,
-      email: user.email,
-      type,
     } as IForgotPassword);
 
     const token = this.signToken(forgotInfo);
-    await this.sendResetEmail(user.email, token);
+    this.sendResetEmail(user.email, token);
     return 'reset instructions have been sent to your registered email';
   }
 
   static async storeForgotPasswordInfo(info: IForgotPassword) {
-    await ForgotPassword.deleteMany({ email: info.email });
+    await ForgotPassword.deleteMany({ user: info.user });
     const forgotPassword = new ForgotPassword(info);
     return forgotPassword.save();
   }
 
   static signToken(payload: any) {
-    return jwt.sign({ id: payload._id, userType: payload.type }, jwtEmailSecret, {
+    return jwt.sign({ id: payload.id, type: TokenType.PASSWORD_RESET }, jwtEmailSecret, {
       expiresIn: '1h',
     });
   }
@@ -68,7 +66,7 @@ export class ForgotPasswordService {
   //   return adminService.getByEmail(email);
   // }
 
-  static async deleteForgotPasswordRequest(data: IForgotPassword) {
+  static async deleteForgotPasswordRequest(_data: IForgotPassword) {
     // return ForgotPassword.deleteMany(data);
   }
 
