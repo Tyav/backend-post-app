@@ -9,7 +9,7 @@ import installRoutes from './routes';
 import l from './logger';
 import morgan from 'morgan';
 import { IDatabase } from './database';
-import swagger from './swagger';
+// import swagger from './swagger';
 import { requestLimit, env, port } from './env';
 
 const app = express();
@@ -21,19 +21,7 @@ export default class ExpressServer {
     app.set('appPath', root + 'client');
     app.use(morgan('dev'));
     // Use JSON parser for all non-webhook routes
-    app.use(
-      (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ): void => {
-        if (req.originalUrl === '/api/v1/transactions/verify') {
-          next();
-        } else {
-          express.json({ limit: requestLimit || '100kb' })(req, res, next);
-        }
-      }
-    );
+    app.use(express.json({ limit: requestLimit || '100kb' }));
 
     app.use(
       express.urlencoded({
@@ -46,7 +34,7 @@ export default class ExpressServer {
   }
 
   router(routes: (app: Application) => void): ExpressServer {
-    swagger(app);
+    // swagger(app);
     installRoutes(app, routes);
     return this;
   }

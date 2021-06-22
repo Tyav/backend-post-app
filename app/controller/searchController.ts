@@ -7,13 +7,13 @@ import sendResponse from '../../helpers/sendResponse';
 // import artistService from '../services/artistService';
 // import genreService from '../services/genreService';
 // import albumService from '../services/albumService';
-import QueryBuilder from '../services/queryService';
+// import QueryBuilder from '../services/queryService';
 
 export class SearchController {
-  async search(req: Request, res: Response, next: NextFunction) {
+  async search(_req: Request, res: Response, next: NextFunction) {
     try {
       // TODO: Impliment search
-      const query = new QueryBuilder(req.query).build();
+      // const query = new QueryBuilder(req.query).build();
 
       /**
        const search = req.query
