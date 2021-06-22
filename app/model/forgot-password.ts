@@ -1,12 +1,8 @@
 import { Document, Schema, model } from 'mongoose';
-import { enumToArray } from '../types/generic';
-import { AccountType } from './accountVerificationModel';
 import { IUser } from './userModel';
 
 export interface IForgotPassword extends Document {
   user: (string & IUser);
-  email: string;
-  type: AccountType;
 }
 
 const ForgotPasswordSchema = new Schema(
@@ -15,10 +11,8 @@ const ForgotPasswordSchema = new Schema(
       type: Schema.Types.ObjectId,
       unique: true,
       required: true,
-      refPath: 'type',
+      ref: 'User',
     },
-    type: { type: String, enum: enumToArray(AccountType), required: true },
-    email: { type: String, required: true },
   },
   {
     timestamps: true,
