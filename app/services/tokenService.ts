@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
-// import { customAlphabet } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 import { jwtSecret, jwtExpirationInterval } from '../../config/env';
 
 export enum TokenType {
@@ -26,10 +26,10 @@ export default class TokenService {
   }
 
   public static generateCode() {
-    // const nanoid = customAlphabet(
-    //   'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz',
-    //   6
-    // );
-    // return nanoid();
+    const nanoid = customAlphabet(
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz',
+      6
+    );
+    return nanoid();
   }
 }

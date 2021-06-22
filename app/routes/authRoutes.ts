@@ -10,7 +10,7 @@ const router = express.Router();
 
 router
   .route('/verify')
-  /**  Sign up a retailer */
+  /**  verify a user */
   .put(
     celebrate(verify, { abortEarly: false }),
     decode(TokenType.VERIFY),
